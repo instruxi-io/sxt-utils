@@ -1,0 +1,32 @@
+{
+	"include": ["src/**/*.ts", "src/**/*.tsx", "**/*.json", "src/*.ts"],
+	"exclude": ["distribution", "node_modules"],
+	"compilerOptions": {
+		"resolveJsonModule": true,
+		"lib": ["ES2017", "DOM"],
+		"module": "ESNext",
+		"target": "ES6",
+		"rootDir": "../",
+		"preserveSymlinks": true,
+		"outDir": "distribution",
+		"importHelpers": false,
+		"moduleResolution": "Node",
+		"jsx": "react-jsx",
+		"baseUrl": ".",
+		"composite": false,
+		"declaration": true,
+		"declarationMap": true,
+		"esModuleInterop": true,
+		"emitDecoratorMetadata": true,
+		"allowSyntheticDefaultImports": true,
+		"experimentalDecorators": true,
+		"forceConsistentCasingInFileNames": true,
+		"inlineSources": false,
+		"isolatedModules": false,
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"preserveWatchOutput": true,
+		"skipLibCheck": true,
+		"strict": true
+	}
+}
