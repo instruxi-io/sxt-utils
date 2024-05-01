@@ -25,6 +25,17 @@ await biscuits.generateTableBiscuits("EXAMPLE_SCHEMA.EXAMPLE_TABLE", BiscuitMake
 ```
 
 
+```javascript
+const BiscuitMaker = require('@instruxi-io/sxt-biscuit-maker');
+
+const biscuitMaker = BiscuitMaker.init();
+
+// expects json file with table keys
+const tableKeys = "./EXAMPLE_SCHEMA.EXAMPLE_TABLE.json";
+
+await biscuits.generateTableBiscuits("EXAMPLE_SCHEMA.EXAMPLE_TABLE", BiscuitMaker, tableKeys);
+```
+
 ## Development
 
 ### 1.) Install dependencies
