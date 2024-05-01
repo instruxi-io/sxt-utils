@@ -1,8 +1,9 @@
-// @ts-nocheck
 import { biscuit, block, authorizer, Biscuit, KeyPair, Fact, PrivateKey, BiscuitBuilder } from '@biscuit-auth/biscuit-wasm';
-import Utils from './utils/utils';
+import Utils from './utils/utils.js';
 import * as fs from 'fs';
 
+import { webcrypto } from 'node:crypto'
+globalThis.crypto = webcrypto
 
 const SQLCommandType = {
     DDL: "ddl",

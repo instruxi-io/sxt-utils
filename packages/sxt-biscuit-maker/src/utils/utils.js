@@ -1,4 +1,3 @@
-// @ts-nocheck
 function checkStringFormat(userString) {
     if(userString == undefined || userString.length === 0 || userString == null) {
         throw new Error('Empty String provided.')

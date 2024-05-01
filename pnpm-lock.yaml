@@ -127,7 +127,7 @@ importers:
   packages/sxt-biscuit-maker:
     specifiers:
       '@babel/preset-env': ^7.24.4
-      '@biscuit-auth/biscuit-wasm': 0.3.0
+      '@biscuit-auth/biscuit-wasm': 0.4.0
       '@ethersproject/abstract-provider': ^5.7.0
       '@nomiclabs/hardhat-ethers': ^2.2.3
       '@nomiclabs/hardhat-waffle': ^2.0.6
@@ -171,7 +171,7 @@ importers:
       webpack-cli: ^5.1.4
     dependencies:
       '@babel/preset-env': 7.24.4_@babel+core@7.24.4
-      '@biscuit-auth/biscuit-wasm': 0.3.0
+      '@biscuit-auth/biscuit-wasm': 0.4.0
       '@stablelib/base64': 1.0.1
       axios: 1.6.8
       babel-loader: 9.1.3_e7ptmj7t4axdi5psjf7bkw5a24
@@ -1402,8 +1402,8 @@ packages:
       to-fast-properties: 2.0.0
     dev: false
 
-  /@biscuit-auth/biscuit-wasm/0.3.0:
-    resolution: {integrity: sha512-ax9OvpvEaS0lyfZK0fKH1CmTiH5xm/c2loU+t0rQGnOAQaF6Y4pbFrOpSu4nwaMGWNeIK+q6lrEGHFnuWcNkdw==}
+  /@biscuit-auth/biscuit-wasm/0.4.0:
+    resolution: {integrity: sha512-Gmz7TjdbpWQaV40GvYDg9uXUwecD1ORGPYDqYZY/Lr4+36rjraztfskKW0iesBy6ygB2Kgh1K11pc7YR8M3mTw==}
     dev: false
 
   /@changesets/apply-release-plan/7.0.0:
