@@ -85,5 +85,10 @@
 		"email": "austin@instruxi.io",
 		"name": "Austin Przybysz",
 		"url": "https://instruxi.io"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/instruxi-io/sxt-utils.git",
+		"directory": "packages/SXT-Typescript-SDK"
 	}
 }
