@@ -8,4 +8,5 @@ Please check Readme of each utility for more information.
 2. [sxt-biscuit-maker](./packages/sxt-biscuit-maker/README.md)
 
 ## Implementation Project
-1. [Mesh Serverless](https://github.com/instruxi-io/mesh-serverless) See `tasks/Sxt-Utils/`
+1. [Mesh Serverless](https://github.com/instruxi-io/mesh-serverless)
+   - See `tasks/Sxt-Utils/`
