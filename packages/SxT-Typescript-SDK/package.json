@@ -1,5 +1,5 @@
 {
-	"name": "@instruxi-io/SxT-Typescript-SDK",
+	"name": "@instruxi-io/sxt-typescript-sdk",
 	"version": "0.0.1",
 	"source": "./src/index.ts",
 	"types": "./distribution/index.d.ts",
