@@ -6,3 +6,6 @@ Please check Readme of each utility for more information.
 ## Utilities
 1. [SxT-Typescript-SDK](./packages/SxT-Typescript-SDK/README.md)
 2. [sxt-biscuit-maker](./packages/sxt-biscuit-maker/README.md)
+
+## Implementation Project
+1. [Mesh Serverless](https://github.com/instruxi-io/mesh-serverless) See `tasks/Sxt-Utils/`
