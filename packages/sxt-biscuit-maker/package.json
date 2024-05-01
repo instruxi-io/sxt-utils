@@ -80,14 +80,15 @@
 		"acorn": "8.0.1"
 	},
 	"files": [
-		"distribution"
+		"distribution",
+		"README.md",
+		"src"
 	],
 	"author": {
 		"email": "austin@instruxi.io",
 		"name": "Austin Przybysz",
 		"url": "https://instruxi.io"
 	},
-	"readme": "README.md",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/instruxi-io/sxt-utils.git",
