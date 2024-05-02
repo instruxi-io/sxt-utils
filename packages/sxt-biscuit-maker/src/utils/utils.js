@@ -23,6 +23,12 @@ function isBase64(str) {
     return true;
   }
 
+function checkResourceIdFormat (resourceId) {
+    const parts = resourceId.split('.');
+    if (parts.length !== 2) {
+        throw error(`Expected a string in the format 'schema.table' but got ${resourceId}`);
+    }
+}
 
 function isHexString(str) {
     return /^[0-9a-fA-F]+$/.test(str);
@@ -40,6 +46,7 @@ let Utils = {
     checkBooleanFormat,
     isBase64,
     isHexString,
+    checkResourceIdFormat
 }
 
 export default Utils;
