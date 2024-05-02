@@ -2,9 +2,8 @@ import { biscuit, block, authorizer, Biscuit, KeyPair, Fact, PrivateKey, Biscuit
 import Utils from './utils/utils.js';
 import * as fs from 'fs';
 
-if (typeof globalThis.crypto === 'undefined' || Object.getOwnPropertyDescriptor(globalThis, 'crypto')?.writable) {
-  globalThis.crypto = webcrypto;
-}
+import { webcrypto } from 'node:crypto'
+globalThis.crypto = webcrypto
 
 const SQLCommandType = {
     DDL: "ddl",
