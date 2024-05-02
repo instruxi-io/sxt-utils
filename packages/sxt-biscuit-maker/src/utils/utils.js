@@ -40,8 +40,16 @@ function checkBooleanFormat(userBoolean) {
     }
 }
 
+function checkResourceIdFormat (resourceId) {
+    const parts = resourceId.split('.');
+    if (parts.length !== 2) {
+        throw error(`Expected a string in the format 'schema.table' but got ${resourceId}`);
+    }
+}
+
 let Utils = {
     checkStringFormat,
+    checkResourceIdFormat,
     checkArrayFormat,
     checkBooleanFormat,
     isBase64,
