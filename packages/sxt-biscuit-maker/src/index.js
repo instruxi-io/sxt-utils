@@ -1,9 +1,10 @@
 import { biscuit, block, authorizer, Biscuit, KeyPair, Fact, PrivateKey, BiscuitBuilder } from '@biscuit-auth/biscuit-wasm';
 import Utils from './utils/utils.js';
-import * as fs from 'fs';
-
 import { webcrypto } from 'node:crypto'
-globalThis.crypto = webcrypto
+
+if (typeof globalThis.crypto === 'undefined' || Object.getOwnPropertyDescriptor(globalThis, 'crypto')?.writable) {
+    globalThis.crypto = webcrypto;
+}
 
 const SQLCommandType = {
     DDL: "ddl",
@@ -39,46 +40,25 @@ export default class BiscuitMaker {
         return new BiscuitMaker();
     }
 
-    checkResourceIdFormat = (resourceId) => {
-        const parts = resourceId.split('.');
-        if (parts.length !== 2) {
-            throw error(`Expected a string in the format 'schema.table' but got ${resourceId}`);
-        }
-    }
-
-    getPrivateKey(privateKeyPath) {
+    generateTableBiscuits = async (resourceId, biscuitMaker, hexEncodedPrivateKey) => {
         try {
-            // Check if the path points to a directory
-            if (fs.lstatSync(privateKeyPath).isDirectory()) {
-                throw new Error(`The path ${privateKeyPath} is a directory, but a file was expected.`);
+            Utils.checkResourceIdFormat(resourceId)
+    
+            if (Utils.isHexString(hexEncodedPrivateKey)){
+                biscuitMaker = biscuitMaker.init()
+                let dml = biscuitMaker.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
+                let ddl = biscuitMaker.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["CREATE", "DROP", "SELECT"])
+                let dql = biscuitMaker.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["SELECT"])
+                let admin = biscuitMaker.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["CREATE", "DROP", "INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
+                let wildcard = biscuitMaker.buildBiscuit(hexEncodedPrivateKey, [resourceId], true, ["CREATE", "DROP", "INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
+                let result = { dml, ddl, dql, admin, wildcard}
+                this._biscuits = result
+                return true;
+            } else {
+                throw new Error("Invalid hex encoded private key");
             }
-
-            // If it's not a directory, read the file
-            const privateKeyData = fs.readFileSync(privateKeyPath, 'utf8');
-            const privateKey = JSON.parse(privateKeyData); // Parse the JSON data into an object
-            return privateKey;
         } catch (error) {
-            console.error(`Error reading private key from ${privateKeyPath}:`, error);
-            throw error;
-        }
-    }
-
-    generateTableBiscuits = async (resourceId, biscuitMaker, privateKeyPath) => {
-        this.checkResourceIdFormat(resourceId)
-        let keys = this.getPrivateKey(privateKeyPath);
-
-        if (keys.hexEncodedPrivateKey){
-            biscuitMaker = biscuitMaker.init()
-            let dml = biscuitMaker.buildBiscuit(keys.hexEncodedPrivateKey, [resourceId], false, ["INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
-            let ddl = biscuitMaker.buildBiscuit(keys.hexEncodedPrivateKey, [resourceId], false, ["CREATE", "DROP", "SELECT"])
-            let dql = biscuitMaker.buildBiscuit(keys.hexEncodedPrivateKey, [resourceId], false, ["SELECT"])
-            let admin = biscuitMaker.buildBiscuit(keys.hexEncodedPrivateKey, [resourceId], false, ["CREATE", "DROP", "INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
-            let wildcard = biscuitMaker.buildBiscuit(keys.hexEncodedPrivateKey, [resourceId], true, ["CREATE", "DROP", "INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
-            let result = { dml, ddl, dql, admin, wildcard}
-            this._biscuits = result
-            return true;
-        } else {
-            return false
+            throw new Error(`Failed to generate table biscuits: ${error.message}`);
         }
     }
 
@@ -132,7 +112,6 @@ export default class BiscuitMaker {
                     return biscuitToken;
                 }
             }
-
         }
         catch(error) {
             return error;
