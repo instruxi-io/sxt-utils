@@ -30,6 +30,7 @@ function checkResourceIdFormat (resourceId) {
     }
 }
 
+
 function isHexString(str) {
     return /^[0-9a-fA-F]+$/.test(str);
 }
