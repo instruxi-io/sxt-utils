@@ -13,4 +13,5 @@ Please check Readme of each utility for more information.
 
 ## Installation Notes
 1. You will need to login to Github's NPM package registry
+   
 `npm login --registry=https://npm.pkg.github.com`
