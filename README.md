@@ -11,6 +11,6 @@ Please check Readme of each utility for more information.
 1. [Mesh Serverless](https://github.com/instruxi-io/mesh-serverless)
    - See `tasks/Sxt-Utils/`
 
-Note, you will need to login to Github's NPM package registry
-
+## Installation Notes
+1. You will need to login to Github's NPM package registry
 `npm login --registry=https://npm.pkg.github.com`
