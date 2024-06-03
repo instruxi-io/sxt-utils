@@ -1,10 +1,6 @@
 import { AxiosResponse } from 'axios';
-import ED25519Wallet from "./ED25519Wallet";
-import {ethers} from "ethers";
 
 export type AuthTypes = 'wallet' | 'user';
-
-
 
 export interface SessionData {
 	accessToken: string;
@@ -13,34 +9,37 @@ export interface SessionData {
 	refreshTokenExpires: number;
 }
 
-export interface Config {
-	signer: ethers.Wallet | ED25519Wallet;
-	baseUrl: string;
-	userId: string;
-	joinCode: string;
-	scheme: string;
-	authType?: string;
-	session?: SessionData
+// accept viem and ethers
+export interface MinimalSigner {
+    getAddress: () => Promise<string>;
+    signMessage: (message: string) => Promise<string>;
 }
 
-export interface HttpSuccess<T = any> {
-    data: T;
+export interface Config {
+    signer: MinimalSigner;
+    baseUrl: string;
+    userId: string;
+    joinCode: string;
+    scheme: string;
+    authType: string;
+    session?: SessionData;
+}  
+
+export interface HttpSuccess {
+    data: any;
     status: number;
     statusText: string;
     headers: any;
     config: any;
     request?: any;
-}
+    authCode?: string;
+  }
 
 export interface HttpError<T = any> extends Error {
     config: any;
     code?: string;
     request?: any;
     response?: AxiosResponse<T>;
-}
-
-export interface AuthCodeData {
-    authCode: string;
 }
 
 interface ABI {
@@ -59,7 +58,7 @@ interface ABI {
     stateMutability: string;
     type: string;
     anonymous?: boolean;
-  }
+}
 
 export interface IndexingRequest {
     namespace: string;

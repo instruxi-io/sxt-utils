@@ -40,17 +40,16 @@ export default class BiscuitMaker {
         return new BiscuitMaker();
     }
 
-    generateTableBiscuits = async (resourceId, biscuitMaker, hexEncodedPrivateKey) => {
+    generateTableBiscuits = async (resourceId, hexEncodedPrivateKey) => {
         try {
             Utils.checkResourceIdFormat(resourceId)
     
             if (Utils.isHexString(hexEncodedPrivateKey)){
-                biscuitMaker = biscuitMaker.init()
-                let dml = biscuitMaker.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
-                let ddl = biscuitMaker.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["CREATE", "DROP", "SELECT"])
-                let dql = biscuitMaker.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["SELECT"])
-                let admin = biscuitMaker.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["CREATE", "DROP", "INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
-                let wildcard = biscuitMaker.buildBiscuit(hexEncodedPrivateKey, [resourceId], true, ["CREATE", "DROP", "INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
+                let dml = this.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
+                let ddl = this.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["CREATE", "DROP", "SELECT"])
+                let dql = this.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["SELECT"])
+                let admin = this.buildBiscuit(hexEncodedPrivateKey, [resourceId], false, ["CREATE", "DROP", "INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
+                let wildcard = this.buildBiscuit(hexEncodedPrivateKey, [resourceId], true, ["CREATE", "DROP", "INSERT", "UPDATE", "MERGE", "DELETE", "SELECT"])
                 let result = { dml, ddl, dql, admin, wildcard}
                 this._biscuits = result
                 return true;
@@ -72,17 +71,17 @@ export default class BiscuitMaker {
             let resourceIdsContainer = resourceIds.map(resourceId => resourceId.toLowerCase())
 
             if(wildCardRequired) {
-                    for(let resourceId of resourceIdsContainer) {
-                        let biscuitBuilder = biscuit``;
-                        let wildcard = '*'
+                for(let resourceId of resourceIdsContainer) {
+                    let biscuitBuilder = biscuit``;
+                    let wildcard = '*'
 
-                        let biscuitBlock = block`sxt:capability(${wildcard},${resourceId})`
-                        biscuitBuilder.merge(biscuitBlock)
+                    let biscuitBlock = block`sxt:capability(${wildcard},${resourceId})`
+                    biscuitBuilder.merge(biscuitBlock)
 
-                        let wildCardBiscuitToken = biscuitBuilder.build(PrivateKey.fromString(privateKey)).toBase64();
-                        return wildCardBiscuitToken;
-                    }
+                    let wildCardBiscuitToken = biscuitBuilder.build(PrivateKey.fromString(privateKey)).toBase64();
+                    return wildCardBiscuitToken;
                 }
+            }
 
             else {
 

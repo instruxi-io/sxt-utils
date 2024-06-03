@@ -1,44 +1,42 @@
 import axios, { AxiosResponse } from 'axios';
 import { Buffer } from 'buffer';
 import { Utils } from './utils/utils-functions';
-import ED25519Wallet from './ED25519Wallet'
-import { ethers } from 'ethers';
-import * as nacl from 'tweetnacl';
+import {MinimalSigner} from './types';
 import {
 	HttpSuccess,
 	HttpError,
-	AuthCodeData,
-	AuthTypes,
 	IndexingRequest,
 	EventTransaction,
 	Config,
 	SessionData
 } from './types';
 
-
-
-export default class SpaceAndTimeSDK implements Config  {
-    signer: ethers.Wallet | ED25519Wallet;
+export default class SpaceAndTimeSDK implements Config {
+    signer: MinimalSigner;
     baseUrl: string;
     userId: string;
     joinCode: string;
     scheme: string;
+    authType: string;
+    publicKey?: string;
     session?: SessionData;
-
+  
     constructor({ signer, baseUrl, userId, joinCode, scheme, authType, session }: Config) {
-        this.baseUrl = baseUrl;
-        this.signer = signer;
-        this.userId = userId;
-        this.joinCode = joinCode;
-        this.scheme = scheme;
-        this.session = session
+      this.baseUrl = baseUrl;
+      this.signer = signer;
+      this.userId = userId;
+      this.joinCode = joinCode;
+      this.scheme = scheme;
+      this.authType = authType;
+      this.session = session;
     }
 
-    static init(config: Config): SpaceAndTimeSDK {
-        return new SpaceAndTimeSDK(config);
+    static async init(config: Config): Promise<SpaceAndTimeSDK> {
+        const instance = new SpaceAndTimeSDK(config);
+        await instance.getPublicKey();
+        return instance;
     }
-
-    // Authentication and Registration API
+      
     async isSessionExpired(): Promise<boolean> {
         if (!this.session) {
             return false;
@@ -53,43 +51,51 @@ export default class SpaceAndTimeSDK implements Config  {
         return this.session;
     }
 
+    private async getPublicKey(): Promise<void> {
+        try {
+            this.publicKey = await this.signer.getAddress();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    
+    async signMessage(message: string): Promise<string> {
+       try {
+          return await this.signer.signMessage(message);
+        } catch (error){
+          throw new Error(error instanceof Error ? error.message : "An unknown error occurred");
+        }
+    }
+
     async generateUserAuthCode(prefix?: string): Promise<[string | null, string | null]> {
         try {
-            const payload = { userId: this.userId, prefix: prefix, joinCode: this.joinCode };
-            const response: AxiosResponse<HttpSuccess<AuthCodeData>> = await axios.post(`${this.baseUrl}/auth/code`, payload);
-            if (response.data) {
-                // @ts-ignore
-				return [response.data.authCode, null];
-            } else {
-                return [null, "Response data is undefined"];
-            }
+          const payload = { userId: this.userId, prefix: prefix, joinCode: this.joinCode };
+          const response: AxiosResponse<HttpSuccess> = await axios.post(`${this.baseUrl}/auth/code`, payload);
+          if (response.data.authCode) {
+            return [response.data.authCode, null];
+          } else {
+            return [null, "Response data is undefined"];
+          }
         } catch (error) {
-            const err = error as Error;
-            console.error(err)
-            return [null, err.message];
+          const err = error as Error;
+          console.error(err);
+          return [null, err.message];
         }
     }
 
     async generateWalletAuthCode(prefix?: string): Promise<[string | null, string | null]> {
         try {
-            const payload = {
-                walletAddr: this.signer.publicKey,
-                userId: this.userId,
-                prefix: prefix,
-                joinCode: this.joinCode
-            };
-            const response: AxiosResponse<HttpSuccess<AuthCodeData>> = await axios.post(`${this.baseUrl}/auth/wallet/code`, payload);
-            if (response.data) {
-                // @ts-ignore
-				return [response.data.authCode, null];
-            } else {
-                return [null, "Response data is undefined"];
-            }
-        }
-        catch(error) {
-            const err = error as Error;
-            console.error(err)
-            return [null, err.message];
+          const payload = { walletAddr: this.publicKey, userId: this.userId, prefix: prefix, joinCode: this.joinCode };
+          const response: AxiosResponse<HttpSuccess> = await axios.post(`${this.baseUrl}/auth/wallet/code`, payload);
+          if (response.data.authCode) {
+            return [response.data.authCode, null];
+          } else {
+            return [null, "Response data is undefined"];
+          }
+        } catch (error) {
+          const err = error as Error;
+          console.error(err);
+          return [null, err.message];
         }
     }
 
@@ -148,69 +154,41 @@ export default class SpaceAndTimeSDK implements Config  {
 
     async generateSignature(message: string): Promise<string> {
         try {
-            if (this.scheme === "ed25519" || "ED25519") {
-                let authCode = new TextEncoder().encode(message);
-                let privateKey = this.signer.privateKey instanceof Uint8Array ? this.signer.privateKey : new TextEncoder().encode(this.signer.privateKey);
-                let signatureArray = nacl.sign(authCode, privateKey);
-                let signature = Buffer.from(signatureArray.buffer, signatureArray.byteOffset, signatureArray.byteLength).toString('hex');
-                return signature.slice(0,128);
-            } else if (this.scheme === "ecdsa" || "ECDSA" || "1") {
-                return await this.signer.signMessage(message);
-            } else {
-                throw new Error("Invalid scheme");
-            }
+            return await this.signer.signMessage(message);
         } catch (error) {
-            throw new Error(error instanceof Error ? error.message : "An unknown error occurred");
+          throw new Error(error instanceof Error ? error.message : "An unknown error occurred");
         }
     }
 
     async generateAuthToken(authCode: string, signature: string): Promise<SessionData | null> {
         try {
-            let key: string;
-            if (this.scheme === "ed25519" || this.scheme === "ED25519") {
-                if (!(this.signer instanceof ED25519Wallet)) {
-                    console.error("ED25519 requires b64 encoded string as signer");
-                    return null;
-                }
-                key = Buffer.from(this.signer.publicKey).toString("base64");
-            } else if (this.scheme === "ecdsa" || this.scheme === "ECDSA" || this.scheme === "1") {
-                if (!(this.signer instanceof ethers.Wallet)) {
-                    console.error("ECDSA requires ethers.Wallet object as signer");
-                    return null;
-                }
-                key = this.signer.address;
-            } else {
-                console.error("invalid scheme");
-                return null;
-            }
-
-            const payload = {
-                userId : this.userId,
-                authCode,
-                signature,
-                key,
-                scheme: this.scheme
-            };
-            const response: AxiosResponse = await axios.post(`${this.baseUrl}/auth/token`, payload);
-            if (response.status !== 200) {
-                console.error(`Request failed with status code ${response.status}`);
-                return null;
-            }
-            const { accessToken, refreshToken, accessTokenExpires, refreshTokenExpires } = response.data;
-            return { accessToken, refreshToken, accessTokenExpires, refreshTokenExpires };
-        } catch (error) {
-            const err = error as Error;
-            console.error(err);
+          const payload = {
+            userId: this.userId,
+            authCode,
+            signature,
+            key: this.publicKey,
+            scheme: this.scheme,
+          };
+          const response: AxiosResponse = await axios.post(`${this.baseUrl}/auth/token`, payload);
+          if (response.status !== 200) {
+            console.error(`Request failed with status code ${response.status}`);
             return null;
+          }
+          const { accessToken, refreshToken, accessTokenExpires, refreshTokenExpires } = response.data;
+          return { accessToken, refreshToken, accessTokenExpires, refreshTokenExpires };
+        } catch (error) {
+          const err = error as Error;
+          console.error(err);
+          return null;
         }
     }
 
-    async authenticate(authType: AuthTypes, prefix: string = ""): Promise<[SessionData | null, HttpError | null]> {
+    async authenticate(prefix: string = ""): Promise<[SessionData | null, HttpError | null]> {
         try {
             let authCodeResponse, authCodeError;
-            if (authType === "wallet") {
+            if (this.authType === "wallet") {
                 [authCodeResponse, authCodeError] = await this.generateWalletAuthCode(prefix);
-            } else if (authType === "user") {
+            } else if (this.authType === "user") {
                 [authCodeResponse, authCodeError] = await this.generateUserAuthCode(prefix);
             } else {
                 return [null, { name: 'Error', message: 'Invalid authType provided', config: {} }];
@@ -218,7 +196,7 @@ export default class SpaceAndTimeSDK implements Config  {
 
             if (authCodeError || !authCodeResponse) {
                 console.error(authCodeError);
-                return [null, { name: 'Error', message: `Failed to generate ${authType} auth token`, config: {} }];
+                return [null, { name: 'Error', message: `Failed to generate ${this.authType} auth token`, config: {} }];
             }
 
             const signature = await this.signer.signMessage(authCodeResponse);
@@ -346,7 +324,6 @@ export default class SpaceAndTimeSDK implements Config  {
         }
     }
 
-    // Discovery API
     private updateUrlVersion(apiUrl: string): string {
         const newVersion: string = "v2"
         const urlParts: string[] = apiUrl.split("/")
@@ -1599,7 +1576,6 @@ export default class SpaceAndTimeSDK implements Config  {
         }
     }
 
-    // Streaming API
     async getInfrastructureGroup(groupId: string): Promise<[HttpSuccess | null, null | HttpError]> {
         try {
             const session = await this.checkSession();
@@ -1630,7 +1606,6 @@ export default class SpaceAndTimeSDK implements Config  {
             return [null, httpError];
         }
     }
-
 
     async createInfrastructureGroup(groupId: string, publicKey: string): Promise<[HttpSuccess | null, null | HttpError]> {
         try {

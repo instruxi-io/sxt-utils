@@ -11,7 +11,7 @@ export interface KeyPairEncodings {
     hexEncodedPrivateKey: string;
 }
 
-export default class ED25519Wallet {
+export default class ED25519Signer {
     public keyPair: nacl.SignKeyPair;
 
     constructor(privateKeyBase64?: string) {
@@ -23,12 +23,12 @@ export default class ED25519Wallet {
         }
     }
 
-    static fromSeed(seed: string): ED25519Wallet {
+    static fromSeed(seed: string): ED25519Signer {
         const keyPair = nacl.sign.keyPair.fromSeed(new TextEncoder().encode(seed));
-        return new ED25519Wallet(encodeB64(keyPair.secretKey));
+        return new ED25519Signer(encodeB64(keyPair.secretKey));
     }
 
-    get publicKey(): Uint8Array {
+    get getAddress(): Uint8Array {
         return this.keyPair.publicKey;
     }
 
@@ -60,12 +60,12 @@ export default class ED25519Wallet {
         });
     }
 
-    static fromJSON(json: string): ED25519Wallet {
+    static fromJSON(json: string): ED25519Signer {
         const obj = JSON.parse(json);
-        return new ED25519Wallet(obj.b64PrivateKey);
+        return new ED25519Signer(obj.b64PrivateKey);
     }
     
-    static generateRandomWallet(): ED25519Wallet {
+    static generateRandomWallet(): ED25519Signer {
         const seed = randomBytes(32);
         return this.fromSeed(encodeB64(seed));
     }
