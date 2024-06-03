@@ -4,7 +4,7 @@ import SpaceAndTimeSDK from '../src/SpaceAndTimeSDK';
 describe('SpaceAndTimeSDK with ethers', () => {
   it('should initialize SDK with a real ethers wallet', async () => {
     // well-known private key for testing
-    const privateKey = '0x16da04b9df0bed2ef777b74c2c1af1d6584e46dbde27bb9dd7f27613ae7b0e8b';
+    const privateKey = '0xbb911d4d69d8f089fd660ec238950c4c5c922ba90f606927063d991e46f06e78';
 
     const wallet = new ethers.Wallet(privateKey);
 
@@ -18,7 +18,7 @@ describe('SpaceAndTimeSDK with ethers', () => {
     const config = {
       signer: signer,
       baseUrl: 'https://api.spaceandtime.app/v1',
-      userId: 'instruxi-100',
+      userId: 'ethers-test',
       joinCode: '',
       scheme: '1', 
       authType: 'wallet', 

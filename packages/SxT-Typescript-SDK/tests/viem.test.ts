@@ -7,7 +7,7 @@ import SpaceAndTimeSDK from '../src/SpaceAndTimeSDK';
 describe('SpaceAndTimeSDK with Viem', () => {
   it('should initialize SDK with Viem', async () => {
     // well-known private key for testing
-    const privateKey = '0xb6b08906be38f1bb2148ff77738b079165d5b0ac78be875c914534bc9b44d88f';
+    const privateKey = '0x4d34fe9f545c5003bb23f74607d619f3365c75f01eff922e7262cb09d0553030';
 
     const account = privateKeyToAccount(privateKey);
 
@@ -26,7 +26,7 @@ describe('SpaceAndTimeSDK with Viem', () => {
     const config = {
       signer: signer,
       baseUrl: 'https://api.spaceandtime.app/v1', 
-      userId: 'instruxi-001', 
+      userId: 'viem-test', 
       joinCode: '', 
       scheme: '1', 
       authType: 'user' // can be `user` or `wallet`, 
