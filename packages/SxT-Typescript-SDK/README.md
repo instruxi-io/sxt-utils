@@ -14,9 +14,9 @@ Note: This package is published to GitHub Package Registry. Please refer to the 
 ## Usage
 
 ```typescript
-import  {SpaceAndTimeSDK}  from '@instruxi-io/sxt-typescript-sdk';
+  import  {SpaceAndTimeSDK}  from '@instruxi-io/sxt-typescript-sdk';
 
-SpaceAndTimeSDK.init({});
+  SpaceAndTimeSDK.init({});
 ```
 
 ```javascript
